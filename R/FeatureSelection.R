@@ -1,4 +1,12 @@
 
+#' Population Heterogeneity
+#'
+#' @param CountsMatrix Feature x cell sparse counts matrix of class dgCMatrix
+#'
+#' @return Numeric vector of gene-wise population heterogeneities
+#' @export
+#'
+#' @examples
 Population <- function(CountsMatrix) {
 
   Total <- Matrix::rowSums(CountsMatrix)
@@ -24,9 +32,19 @@ Population <- function(CountsMatrix) {
   Pop
 }
 
+#' Feature Selection by Population Heterogeneity
+#'
+#' @param CountsMatrix Feature x cell sparse counts matrix of class dgCMatrix
+#' @param minCounts Minimum number of transcripts per gene
+#' @param nGenes Number of genes selected
+#'
+#' @return Vector of top genes by population heterogeneity
+#' @export
+#'
+#' @examples
 FeatureSelection <- function(CountsMatrix, minCounts = 100, nGenes = 500){
 
-  Exp <- rownames(CountsMatrix)[Matrix::rowSums(CountsMatrix) > minCounts]
+  Exp <- rownames(CountsMatrix)[Matrix::rowSums(CountsMatrix) >= minCounts]
 
   Div <- Population(CountsMatrix[Exp,])
   GOI <- names(sort(Div, decreasing = T)[1:nGenes])

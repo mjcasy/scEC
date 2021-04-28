@@ -1,3 +1,13 @@
+
+#' Differential Expression by Inter-Type Heterogeneity
+#'
+#' @param CountsMatrix Feature x cell sparse counts matrix of class dgCMatrix
+#' @param Identity Factor of cell identities
+#'
+#' @return Numeric vector of gene-wise inter-type heterogeneities
+#' @export
+#'
+#' @examples
 DifferentialExpression <- function(CountsMatrix, Identity) {
 
   if(length(Identity) != ncol(CountsMatrix)){

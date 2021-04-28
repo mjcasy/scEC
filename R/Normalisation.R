@@ -1,3 +1,12 @@
+#' James-Stein Frequency Estimator
+#'
+#' @param transposeCounts Transposed sparse count matrix
+#' @param ind Integer indicating chosen gene (row number in count matrix)
+#' @param N N Number of cells
+#' @param Total Total Integer of total counts per cell
+#'
+#' @return Numeric vector of shrinkage cell frequencies
+#'
 GetFreqShrink <- function(transposeCounts, ind, N, Total){
 
   tk <- rep(1/N, N)
@@ -21,6 +30,12 @@ GetFreqShrink <- function(transposeCounts, ind, N, Total){
 }
 
 
+#' Normalise Frequencies
+#'
+#' @param CountsMatrix Feature x cell sparse counts matrix of class dgCMatrix
+#'
+#' @return Feature x cell dense matrix of frequencies
+#'
 GetFreq <- function(CountsMatrix){
 
   Total <- Matrix::rowSums(CountsMatrix)

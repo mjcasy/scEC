@@ -1,5 +1,17 @@
 
-scEC <- function(CountsMatrix, Maxiter, Multistart = 5, Seed){
+#' Single-Cell Entropic Clustering
+#'
+#' @param CountsMatrix Feature x cell sparse counts matrix of class dgCMatrix
+#' @param MaxClus Maximum number of clusters
+#' @param Multistart Number of restarts at each step
+#' @param Seed Seed
+#'
+#' @return Matrix where each column is a vector of integer identities. The Nth
+#' column encodes N clusters.
+#' @export
+#'
+#' @examples
+scEC <- function(CountsMatrix, MaxClus, Multistart = 5, Seed){
 
   if(!missing(Seed)){
     set.seed(Seed)
@@ -11,24 +23,24 @@ scEC <- function(CountsMatrix, Maxiter, Multistart = 5, Seed){
 
   FullFreq <- GetFreq(CountsMatrix)
 
-  Ident <- matrix(NA, nrow = N, ncol = Maxiter)
+  Ident <- matrix(NA, nrow = N, ncol = MaxClus)
   Ident[,1] <- 0
 
   IdentSplit <- 0
-  BoolNewIdent <- matrix(FALSE, nrow = N, ncol = 2*Maxiter)
+  BoolNewIdent <- matrix(FALSE, nrow = N, ncol = 2*MaxClus)
 
-  mu <- multiStartSplitCell(freq = FullFreq, multistart = Multistart)
+  mu <- splitCells$multiStartSplitCell(freq = FullFreq, multistart = Multistart)
 
   newIdent <- apply(mu, 1, which.max) - 1
   newBool <- newIdent == 1
 
   BoolNewIdent[,1] <- newBool
 
-  Score <- sum(intertype(FullFreq, newIdent)) - sum(intertype(FullFreq, Ident[,1]))
+  Score <- sum(splitCells$intertype(FullFreq, newIdent)) - sum(splitCells$intertype(FullFreq, Ident[,1]))
 
   k <- 2
 
-  for(i in 2:Maxiter){
+  for(i in 2:MaxClus){
 
     if(all(Score == 0)){
       message("Cellular Equivalence Reached")
@@ -51,7 +63,7 @@ scEC <- function(CountsMatrix, Maxiter, Multistart = 5, Seed){
 
       if(sum(BoolCells) > 1 & length(table(Freq)) > 1){
 
-        mu <- multiStartSplitCell(freq = Freq, multistart = Multistart)
+        mu <- splitCells$multiStartSplitCell(freq = Freq, multistart = Multistart)
 
         newIdent <- apply(mu, 1, which.max) - 1
         newBool <- newIdent == 1
@@ -62,7 +74,8 @@ scEC <- function(CountsMatrix, Maxiter, Multistart = 5, Seed){
         newIdent <- Ident[,i]
         newIdent[BoolNewIdent[,k]] <- i
 
-        Score[k] <- sum(intertype(FullFreq, newIdent)) - sum(intertype(FullFreq, Ident[,i]))
+        Score[k] <- sum(splitCells$intertype(FullFreq, newIdent)) -
+          sum(splitCells$intertype(FullFreq, Ident[,i]))
 
 
       } else {
@@ -80,6 +93,15 @@ scEC <- function(CountsMatrix, Maxiter, Multistart = 5, Seed){
   Ident
 }
 
+#' Comparitive Gain in Inter-Type Heterogeneity
+#'
+#' @param CountsMatrix Feature x cell sparse counts matrix of class dgCMatrix
+#' @param IdentMat Matrix output of scEC
+#'
+#' @return Observed versus expected gains in inter-type heterogeneity
+#' @export
+#'
+#' @examples
 EntropyGain <- function(CountsMatrix, IdentMat){
 
   reticulate::source_python("~/OneDrive - University of Southampton/Entropy/scIC/Scripts_for_pkg/Heterogeneity.py")
@@ -87,13 +109,13 @@ EntropyGain <- function(CountsMatrix, IdentMat){
   MaxClus <- ncol(IdentMat)
   Freq <- GetFreq(CountsMatrix)
 
-  Pop <- sum(pop(freq = Freq))
+  Pop <- sum(splitCells$pop(freq = Freq))
   Unif <- (Pop / log(ncol(CountsMatrix)))*log(1:MaxClus)
   Exp <- Unif[2:MaxClus] - Unif[1:(MaxClus-1)]
 
   Inter <- c()
   for(i in 1:MaxClus){
-    Inter[i] <- sum(intertype(freq = Freq, ident = IdentMat[,i]))
+    Inter[i] <- sum(splitCells$intertype(freq = Freq, ident = IdentMat[,i]))
   }
   Obs <- Inter[2:MaxClus] - Inter[1:(MaxClus-1)]
 
