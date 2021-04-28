@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-scEC <- function(CountsMatrix, MaxClus, Multistart = 5, Seed){
+Cluster <- function(CountsMatrix, MaxClus, Multistart = 5, Seed){
 
   if(!missing(Seed)){
     set.seed(Seed)
@@ -29,14 +29,14 @@ scEC <- function(CountsMatrix, MaxClus, Multistart = 5, Seed){
   IdentSplit <- 0
   BoolNewIdent <- matrix(FALSE, nrow = N, ncol = 2*MaxClus)
 
-  mu <- splitCells$multiStartSplitCell(freq = FullFreq, multistart = Multistart)
+  mu <- PyFunc$multiStartSplitCell(freq = FullFreq, multistart = Multistart)
 
   newIdent <- apply(mu, 1, which.max) - 1
   newBool <- newIdent == 1
 
   BoolNewIdent[,1] <- newBool
 
-  Score <- sum(splitCells$intertype(FullFreq, newIdent)) - sum(splitCells$intertype(FullFreq, Ident[,1]))
+  Score <- sum(PyFunc$intertype(FullFreq, newIdent)) - sum(PyFunc$intertype(FullFreq, Ident[,1]))
 
   k <- 2
 
@@ -63,7 +63,7 @@ scEC <- function(CountsMatrix, MaxClus, Multistart = 5, Seed){
 
       if(sum(BoolCells) > 1 & length(table(Freq)) > 1){
 
-        mu <- splitCells$multiStartSplitCell(freq = Freq, multistart = Multistart)
+        mu <- PyFunc$multiStartSplitCell(freq = Freq, multistart = Multistart)
 
         newIdent <- apply(mu, 1, which.max) - 1
         newBool <- newIdent == 1
@@ -74,8 +74,8 @@ scEC <- function(CountsMatrix, MaxClus, Multistart = 5, Seed){
         newIdent <- Ident[,i]
         newIdent[BoolNewIdent[,k]] <- i
 
-        Score[k] <- sum(splitCells$intertype(FullFreq, newIdent)) -
-          sum(splitCells$intertype(FullFreq, Ident[,i]))
+        Score[k] <- sum(PyFunc$intertype(FullFreq, newIdent)) -
+          sum(PyFunc$intertype(FullFreq, Ident[,i]))
 
 
       } else {
@@ -109,13 +109,13 @@ EntropyGain <- function(CountsMatrix, IdentMat){
   MaxClus <- ncol(IdentMat)
   Freq <- GetFreq(CountsMatrix)
 
-  Pop <- sum(splitCells$pop(freq = Freq))
+  Pop <- sum(PyFunc$pop(freq = Freq))
   Unif <- (Pop / log(ncol(CountsMatrix)))*log(1:MaxClus)
   Exp <- Unif[2:MaxClus] - Unif[1:(MaxClus-1)]
 
   Inter <- c()
   for(i in 1:MaxClus){
-    Inter[i] <- sum(splitCells$intertype(freq = Freq, ident = IdentMat[,i]))
+    Inter[i] <- sum(PyFunc$intertype(freq = Freq, ident = IdentMat[,i]))
   }
   Obs <- Inter[2:MaxClus] - Inter[1:(MaxClus-1)]
 
