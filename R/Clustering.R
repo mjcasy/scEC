@@ -2,16 +2,18 @@
 #' Single-Cell Entropic Clustering
 #'
 #' @param CountsMatrix Feature x cell sparse counts matrix of class dgCMatrix
-#' @param MaxClus Maximum number of clusters
+#' @param numClus Number of clusters (or maximum number of clusters for greedy)
 #' @param Multistart Number of restarts at each step
+#' @param Greedy Boolean. Should greedy algorithm be used.
 #' @param Seed Seed
 #'
-#' @return Matrix where each column is a vector of integer identities. The Nth
-#' column encodes N clusters.
+#' @return When Greedy = F, vector of integer identities. When Greedy = T,
+#' matrix where each column is a vector of integer identities. The Nth column
+#' encodes N clusters.
 #' @export
 #'
 #' @examples
-Cluster <- function(CountsMatrix, MaxClus, Multistart = 5, Seed){
+Cluster <- function(CountsMatrix, numClus, Multistart = 5, Greedy = T, Seed){
 
   if(!missing(Seed)){
     set.seed(Seed)
@@ -23,70 +25,77 @@ Cluster <- function(CountsMatrix, MaxClus, Multistart = 5, Seed){
 
   FullFreq <- GetFreq(CountsMatrix)
 
-  Ident <- matrix(NA, nrow = N, ncol = MaxClus)
-  Ident[,1] <- 0
+  if(Greedy == F){
+    mu <- PyFunc$multiStartClusterCells(freq = FullFreq, numClusters = numClus, multistart = Multistart)
+    Ident <- apply(mu, 1, which.max) - 1
 
-  IdentSplit <- 0
-  BoolNewIdent <- matrix(FALSE, nrow = N, ncol = 2*MaxClus)
+  } else if(Greedy == T){
 
-  mu <- PyFunc$multiStartSplitCell(freq = FullFreq, multistart = Multistart)
+    Ident <- matrix(NA, nrow = N, ncol = numClus)
+    Ident[,1] <- 0
 
-  newIdent <- apply(mu, 1, which.max) - 1
-  newBool <- newIdent == 1
+    IdentSplit <- 0
+    BoolNewIdent <- matrix(FALSE, nrow = N, ncol = 2*numClus)
 
-  BoolNewIdent[,1] <- newBool
+    mu <- PyFunc$multiStartSplitCell(freq = FullFreq, multistart = Multistart)
 
-  Score <- sum(PyFunc$intertype(FullFreq, newIdent)) - sum(PyFunc$intertype(FullFreq, Ident[,1]))
+    newIdent <- apply(mu, 1, which.max) - 1
+    newBool <- newIdent == 1
 
-  k <- 2
+    BoolNewIdent[,1] <- newBool
 
-  for(i in 2:MaxClus){
+    Score <- sum(PyFunc$intertype(FullFreq, newIdent)) - sum(PyFunc$intertype(FullFreq, Ident[,1]))
 
-    if(all(Score == 0)){
-      message("Cellular Equivalence Reached")
-      break()
-    }
+    k <- 2
 
-    Choosen <- which.max(Score)
-    Ident[,i] <- Ident[,(i-1)]
-    Ident[BoolNewIdent[,Choosen], i] <- i-1
+    for(i in 2:numClus){
 
-    Idents2Split <- c(IdentSplit[Choosen], i-1)
-
-    Score[Choosen] <- 0
-
-    for(j in Idents2Split){
-      BoolCells <- (Ident[,i] == j)
-
-      Freq <- FullFreq[, BoolCells, drop = FALSE]
-      Freq <- sweep(Freq, 1, rowSums(Freq), '/')
-
-      if(sum(BoolCells) > 1 & length(table(Freq)) > 1){
-
-        mu <- PyFunc$multiStartSplitCell(freq = Freq, multistart = Multistart)
-
-        newIdent <- apply(mu, 1, which.max) - 1
-        newBool <- newIdent == 1
-
-        IdentSplit[k] <- j
-        BoolNewIdent[BoolCells, k] <- newBool
-
-        newIdent <- Ident[,i]
-        newIdent[BoolNewIdent[,k]] <- i
-
-        Score[k] <- sum(PyFunc$intertype(FullFreq, newIdent)) -
-          sum(PyFunc$intertype(FullFreq, Ident[,i]))
-
-
-      } else {
-
-        IdentSplit[k] <- j
-        BoolNewIdent[BoolCells, k] <- FALSE
-        Score[k] <- 0
-
+      if(all(Score == 0)){
+        message("Cellular Equivalence Reached")
+        break()
       }
 
-      k <- k+1
+      Choosen <- which.max(Score)
+      Ident[,i] <- Ident[,(i-1)]
+      Ident[BoolNewIdent[,Choosen], i] <- i-1
+
+      Idents2Split <- c(IdentSplit[Choosen], i-1)
+
+      Score[Choosen] <- 0
+
+      for(j in Idents2Split){
+        BoolCells <- (Ident[,i] == j)
+
+        Freq <- FullFreq[, BoolCells, drop = FALSE]
+        Freq <- sweep(Freq, 1, rowSums(Freq), '/')
+
+        if(sum(BoolCells) > 1 & length(table(Freq)) > 1){
+
+          mu <- PyFunc$multiStartSplitCell(freq = Freq, multistart = Multistart)
+
+          newIdent <- apply(mu, 1, which.max) - 1
+          newBool <- newIdent == 1
+
+          IdentSplit[k] <- j
+          BoolNewIdent[BoolCells, k] <- newBool
+
+          newIdent <- Ident[,i]
+          newIdent[BoolNewIdent[,k]] <- i
+
+          Score[k] <- sum(PyFunc$intertype(FullFreq, newIdent)) -
+            sum(PyFunc$intertype(FullFreq, Ident[,i]))
+
+
+        } else {
+
+          IdentSplit[k] <- j
+          BoolNewIdent[BoolCells, k] <- FALSE
+          Score[k] <- 0
+
+        }
+
+        k <- k+1
+      }
     }
   }
 
@@ -96,7 +105,7 @@ Cluster <- function(CountsMatrix, MaxClus, Multistart = 5, Seed){
 #' Comparitive Gain in Inter-Type Heterogeneity
 #'
 #' @param CountsMatrix Feature x cell sparse counts matrix of class dgCMatrix
-#' @param IdentMat Matrix output of scEC
+#' @param IdentMat Matrix output of scEC (Greedy = T)
 #'
 #' @return Observed versus expected gains in inter-type heterogeneity
 #' @export
@@ -106,20 +115,20 @@ EntropyGain <- function(CountsMatrix, IdentMat){
 
   reticulate::source_python("~/OneDrive - University of Southampton/Entropy/scIC/Scripts_for_pkg/Heterogeneity.py")
 
-  MaxClus <- ncol(IdentMat)
+  numClus <- ncol(IdentMat)
   Freq <- GetFreq(CountsMatrix)
 
   Pop <- sum(PyFunc$pop(freq = Freq))
-  Unif <- (Pop / log(ncol(CountsMatrix)))*log(1:MaxClus)
-  Exp <- Unif[2:MaxClus] - Unif[1:(MaxClus-1)]
+  Unif <- (Pop / log(ncol(CountsMatrix)))*log(1:numClus)
+  Exp <- Unif[2:numClus] - Unif[1:(numClus-1)]
 
   Inter <- c()
-  for(i in 1:MaxClus){
+  for(i in 1:numClus){
     Inter[i] <- sum(PyFunc$intertype(freq = Freq, ident = IdentMat[,i]))
   }
-  Obs <- Inter[2:MaxClus] - Inter[1:(MaxClus-1)]
+  Obs <- Inter[2:numClus] - Inter[1:(numClus-1)]
 
-  ClusNum <- 2:MaxClus
+  ClusNum <- 2:numClus
   Gain <- cbind(ClusNum, Obs, Exp)
 
   Gain

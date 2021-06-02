@@ -42,7 +42,102 @@ def intertype(freq, ident):
   return intertypeG
 
 
-def funcCost(muVec, freq, tfreq):
+def funcCost(wVec, freq, tfreq):
+  N = freq.shape[1]
+  C = int((wVec.size / N))
+  
+  wVecar = np.array(wVec)
+  W = wVecar.reshape(N, C)
+  M = np.sum(np.exp(W), 1)
+  mu = np.exp(W) / M[:,None]
+  
+  y = freq @ mu
+  
+  Nj = np.sum(mu, 0)
+  logNj = np.log(Nj)
+  
+  Is = -1*np.sum(y * (np.log(N * y) - logNj))
+  
+  return Is
+  
+  
+def gradCost(wVec, freq, tfreq):
+  N = freq.shape[1]
+  C = int(wVec.size / N)
+  
+  wVecar = np.array(wVec)
+  W = wVecar.reshape(N, C)
+  M = np.sum(np.exp(W), 1)
+  mu = np.exp(W) / M[:,None]
+  
+  y = freq @ mu
+  
+  Nj = np.sum(mu, 0)
+  yNj = y / Nj
+  
+  term1 = np.log(yNj) + np.log(N) + 1
+  dIsdu = tfreq @ term1
+  term2 = -1*np.sum(yNj, 0)
+  dIsdu = dIsdu + term2
+  dIsdw = dIsdu * mu * (1 - mu)
+  
+  iterC = np.arange(C)
+  
+  for j in iterC:
+    ind = iterC[iterC!=j]
+    term2 = np.transpose(-1 * np.transpose(mu[:,ind]) * mu[:,j])
+    dIsdw[:,j] = dIsdw[:,j] + np.sum(dIsdu[:,ind] * term2, 1)
+  
+  dIsdwVec = -1 * dIsdw.reshape((dIsdw.size,))
+  return dIsdwVec
+  
+  
+def clusterCells(freq, numClusters):
+  freq = np.array(freq)
+  numClusters = int(numClusters)
+  
+  cN = freq.shape[1]
+  tfreq = freq.T
+  wVec = np.random.uniform(low = -0.5, high = 0.5, size = (numClusters*cN,))
+      
+  bounding = 3
+  Bounds=optimize.Bounds(lb=-bounding, ub=bounding)
+  
+  Out = optimize.minimize(funcCost, 
+                          x0 = wVec, 
+                          args = (freq, tfreq), 
+                          method = 'L-BFGS-B',
+                          jac=gradCost,
+                          bounds=Bounds)
+                          
+  W = Out.x.reshape(cN, numClusters)
+  M = np.sum(np.exp(W), 1)
+  mu = np.exp(W) / M[:,None]
+  
+  return mu
+
+
+def multiStartClusterCells(freq, numClusters, multistart):
+  
+  freq = np.array(freq)
+  numClusters = int(numClusters)
+  multistart = int(multistart)
+  
+  maxScore = 0
+
+  for i in range(multistart):
+    tempMu = clusterCells(freq, numClusters)
+    newIdent = tempMu.argmax(1)
+    Score = intertype(freq, newIdent).sum()
+    
+    if Score > maxScore:
+      maxmu = tempMu
+      maxScore = Score
+    
+  return maxmu
+
+
+def greedyFuncCost(muVec, freq, tfreq):
   N = freq.shape[1]
   C = int((muVec.size / N) + 1)
   
@@ -65,7 +160,7 @@ def funcCost(muVec, freq, tfreq):
   return Is
 
 
-def gradCost(muVec, freq, tfreq):
+def greedyGradCost(muVec, freq, tfreq):
   
   G = freq.shape[0]
   N = freq.shape[1]
@@ -103,11 +198,11 @@ def splitCells(freq):
       
   bnd = optimize.Bounds(lb=0, ub=1)
   
-  Out = optimize.minimize(funcCost, 
+  Out = optimize.minimize(greedyFuncCost, 
                           x0 = muVec, 
                           args = (freq, tfreq), 
                           method = 'L-BFGS-B',
-                          jac=gradCost,
+                          jac=greedyGradCost,
                           bounds=bnd)
                           
   mu = np.zeros(shape = (N, C))

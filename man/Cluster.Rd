@@ -4,20 +4,23 @@
 \alias{Cluster}
 \title{Single-Cell Entropic Clustering}
 \usage{
-Cluster(CountsMatrix, MaxClus, Multistart = 5, Seed)
+Cluster(CountsMatrix, numClus, Multistart = 5, Greedy = F, Seed)
 }
 \arguments{
 \item{CountsMatrix}{Feature x cell sparse counts matrix of class dgCMatrix}
 
-\item{MaxClus}{Maximum number of clusters}
+\item{numClus}{Number of clusters (or maximum number of clusters for greedy)}
 
 \item{Multistart}{Number of restarts at each step}
+
+\item{Greedy}{Boolean. Should greedy algorithm be used.}
 
 \item{Seed}{Seed}
 }
 \value{
-Matrix where each column is a vector of integer identities. The Nth
-column encodes N clusters.
+When Greedy = F, vector of integer identities. When Greedy = T,
+matrix where each column is a vector of integer identities. The Nth column
+encodes N clusters.
 }
 \description{
 Single-Cell Entropic Clustering

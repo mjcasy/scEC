@@ -9,7 +9,7 @@ EntropyGain(CountsMatrix, IdentMat)
 \arguments{
 \item{CountsMatrix}{Feature x cell sparse counts matrix of class dgCMatrix}
 
-\item{IdentMat}{Matrix output of scEC}
+\item{IdentMat}{Matrix output of scEC (Greedy = T)}
 }
 \value{
 Observed versus expected gains in inter-type heterogeneity
