@@ -1,58 +1,53 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# scEC
+scEC
+====
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 Single-cell Entropic Clustering (scEC) provides an entropy based
 approach to normalisation, feature selection, differential expression
 analysis and unsupervised clustering of single-cell RNA-sequencing data.
 
-## Installation
+Installation
+------------
 
 You can install the the development version from
 [GitHub](https://github.com/) with:
 
-``` r
-# install.packages("devtools")
-devtools::install_github("mjcasy/scEC")
-```
+    # install.packages("devtools")
+    devtools::install_github("mjcasy/scEC")
 
-## Workflow
+Workflow
+--------
 
 The basic workflow is demonstrated on the Tian et al 2018, single-cell
 mixology data set, a mixture of three cancerous cell lines
-(<https://github.com/LuyiTian/sc_mixology>).
+(<a href="https://github.com/LuyiTian/sc_mixology" class="uri">https://github.com/LuyiTian/sc_mixology</a>).
 
-``` r
-library(scEC)
-library(Matrix)
+    library(scEC)
+    library(Matrix)
 
-load(paste0(Path, "CountsMatrix"))
+    load(paste0(Path, "CountsMatrix"))
 
-CountsMatrix <- CountsMatrix[rowSums(CountsMatrix) >= 100,]
+    CountsMatrix <- CountsMatrix[rowSums(CountsMatrix) >= 100,]
 
-PopHet <- Population(CountsMatrix)
-Mean <- log10(rowMeans(CountsMatrix))
-N <- ncol(CountsMatrix)
+    PopHet <- Population(CountsMatrix)
+    Mean <- log10(rowMeans(CountsMatrix))
+    N <- ncol(CountsMatrix)
 
-plot(Mean, PopHet, ylim = c(0, log(N)))
-```
+    plot(Mean, PopHet, ylim = c(0, log(N)))
 
 <img src="man/figures/README-example-1.png" width="100%" />
 
-``` r
-GOI <- FeatureSelection(CountsMatrix)
-CountsMatrix <- CountsMatrix[GOI,]
-Mean <- Mean[GOI]
+    GOI <- FeatureSelection(CountsMatrix)
+    CountsMatrix <- CountsMatrix[GOI,]
+    Mean <- Mean[GOI]
 
-Clustering <- Cluster(CountsMatrix, MaxClus = 3)
-InterType <- DifferentialExpression(CountsMatrix, Clustering[,3])
+    Clustering <- Cluster(CountsMatrix, MaxClus = 3)
+    InterType <- DifferentialExpression(CountsMatrix, Clustering[,3])
 
-plot(Mean, InterType)
-```
+    plot(Mean, InterType)
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />

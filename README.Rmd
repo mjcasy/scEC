@@ -1,5 +1,5 @@
 ---
-output: github_document
+output: md_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -36,7 +36,7 @@ The basic workflow is demonstrated on the Tian et al 2018, single-cell mixology 
 Path <- "~/OneDrive - University of Southampton/Data/Tian2018/ThreeClasses/"
 ```
 
-```{r example}
+```{r example, dpi=300}
 library(scEC)
 library(Matrix)
 
@@ -51,7 +51,7 @@ N <- ncol(CountsMatrix)
 plot(Mean, PopHet, ylim = c(0, log(N)))
 ```
 
-```{r}
+```{r, dpi=300}
 GOI <- FeatureSelection(CountsMatrix)
 CountsMatrix <- CountsMatrix[GOI,]
 Mean <- Mean[GOI]
