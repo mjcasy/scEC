@@ -196,7 +196,7 @@ def splitCells(freq):
   
   muVec = np.random.uniform(low = 0.45, high = 0.55, size = (N,1))
       
-  bnd = optimize.Bounds(lb=0.05, ub=0.95)
+  bnd = optimize.Bounds(lb=0.1, ub=0.9)
   
   Out = optimize.minimize(greedyFuncCost, 
                           x0 = muVec, 
