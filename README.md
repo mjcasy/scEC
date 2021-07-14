@@ -45,8 +45,8 @@ mixology data set, a mixture of three cancerous cell lines
     CountsMatrix <- CountsMatrix[GOI,]
     Mean <- Mean[GOI]
 
-    Clustering <- Cluster(CountsMatrix, MaxClus = 3)
-    InterType <- DifferentialExpression(CountsMatrix, Clustering[,3])
+    Clustering <- Cluster(CountsMatrix, numClus = 3)
+    InterType <- DifferentialExpression(CountsMatrix)
 
     plot(Mean, InterType)
 
