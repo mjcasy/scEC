@@ -56,8 +56,8 @@ GOI <- FeatureSelection(CountsMatrix)
 CountsMatrix <- CountsMatrix[GOI,]
 Mean <- Mean[GOI]
 
-Clustering <- Cluster(CountsMatrix, MaxClus = 3)
-InterType <- DifferentialExpression(CountsMatrix, Clustering[,3])
+Clustering <- scEC::Cluster(CountsMatrix, numClus = 3)
+InterCluster <- DifferentialExpression(CountsMatrix, Clustering)
 
-plot(Mean, InterType)
+plot(Mean, InterCluster)
 ```

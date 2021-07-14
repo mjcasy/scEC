@@ -13,7 +13,7 @@
 #' @export
 #'
 #' @examples
-Cluster <- function(CountsMatrix, numClus, Multistart = 5, Greedy = T, Seed){
+Cluster <- function(CountsMatrix, numClus, Multistart = 5, Greedy = F, Seed){
 
   if(!missing(Seed)){
     set.seed(Seed)
