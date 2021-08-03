@@ -102,8 +102,7 @@ The gene-matched data sets can then be mapped.
 
     Ident <- scEC::Map(MapCountsMatrix = MapCountsMatrix,
                        ReferenceCountsMatrix = ReferenceCountsMatrix, 
-                       ReferenceID = ReferenceID, 
-                       nGenes = 1000)
+                       ReferenceID = ReferenceID)
 
     knitr::kable(table(Ident, MapID))
 

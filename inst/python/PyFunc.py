@@ -268,26 +268,6 @@ def meld(freq, refID):
   return mu
 
 
-def multiStartMeld(freq, refID, multistart):
-  
-  freq = np.array(freq)
-  multistart = int(multistart)
-  
-  maxScore = 0
-
-  for i in range(multistart):
-    tempMu = meld(freq, refID)
-    newIdent = tempMu.argmax(1)
-    newIdent = np.concatenate((refID, newIdent))
-    Score = intertype(freq, newIdent).sum()
-    
-    if Score > maxScore:
-      maxmu = tempMu
-      maxScore = Score
-    
-  return maxmu
-
-
 def funcCostMeld(wVec, freq, tfreq, refW):
   N = freq.shape[1]
   mapN = N - refW.shape[0]

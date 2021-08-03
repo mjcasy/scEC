@@ -4,12 +4,7 @@
 \alias{MapFeatureSelection}
 \title{Feature Selection by Inter-cluster Heterogeneity}
 \usage{
-MapFeatureSelection(
-  ReferenceCountsMatrix,
-  ReferenceID,
-  minCounts = 100,
-  nGenes = 500
-)
+MapFeatureSelection(ReferenceCountsMatrix, ReferenceID, minCounts, nGenes)
 }
 \arguments{
 \item{ReferenceCountsMatrix}{Reference count matrix; feature x cell sparse counts matrix of class dgCMatrix}

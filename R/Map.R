@@ -10,7 +10,7 @@
 #' @return Vector of top genes by inter-cluster heterogeneity
 #'
 #' @examples
-MapFeatureSelection <- function(ReferenceCountsMatrix, ReferenceID, minCounts = 100, nGenes = 500){
+MapFeatureSelection <- function(ReferenceCountsMatrix, ReferenceID, minCounts, nGenes){
 
   Exp <- rownames(ReferenceCountsMatrix)[Matrix::rowSums(ReferenceCountsMatrix) >= minCounts]
 
@@ -27,14 +27,13 @@ MapFeatureSelection <- function(ReferenceCountsMatrix, ReferenceID, minCounts = 
 #' @param ReferenceID Factor of reference cell identities
 #' @param minCounts Minimum number of transcripts per gene
 #' @param nGenes Number of genes selected
-#' @param Multistart Number of initial identity vectors trialed
 #' @param Seed Seed set for both R and Python components
 #'
 #' @return Mapped cellular identities
 #' @export
 #'
 #' @examples
-Map <- function(MapCountsMatrix, ReferenceCountsMatrix, ReferenceID, minCounts = 100, nGenes = 500, Multistart = 1, Seed){
+Map <- function(MapCountsMatrix, ReferenceCountsMatrix, ReferenceID, minCounts = 100, nGenes = 1000, Seed){
 
   if(!missing(Seed)){
     set.seed(Seed)
@@ -55,7 +54,7 @@ Map <- function(MapCountsMatrix, ReferenceCountsMatrix, ReferenceID, minCounts =
   FullFreq <- cbind((RefN/N) * RefFreq, (MapN/N) * MapFreq)
   RefID <- as.numeric(ReferenceID)-1
 
-  mu <- PyFunc$multiStartMeld(freq = FullFreq, refID = RefID, multistart = Multistart)
+  mu <- PyFunc$eld(freq = FullFreq, refID = RefID)
   Ident <- apply(mu, 1, which.max) - 1
 
   levels(ReferenceID)[Ident+1]

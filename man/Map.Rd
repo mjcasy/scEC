@@ -9,8 +9,7 @@ Map(
   ReferenceCountsMatrix,
   ReferenceID,
   minCounts = 100,
-  nGenes = 500,
-  Multistart = 1,
+  nGenes = 1000,
   Seed
 )
 }
@@ -21,7 +20,9 @@ Map(
 
 \item{ReferenceID}{Factor of reference cell identities}
 
-\item{Multistart}{Number of initial identity vectors trialed}
+\item{minCounts}{Minimum number of transcripts per gene}
+
+\item{nGenes}{Number of genes selected}
 
 \item{Seed}{Seed set for both R and Python components}
 }
