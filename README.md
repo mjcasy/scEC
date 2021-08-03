@@ -56,6 +56,19 @@ mixology data set, a mixture of three cancerous cell lines
 
 ## Mapping to reference
 
+A novel count matrix can be mapped onto a previously clustered,
+reference counts matrix. Such mapping is useful in clustering samples
+from tissues for which cell atlases have already been generated.
+
+Tian et al 2018 also included an expanded data set, covering five
+cancerous cell lines, inclusive of the three cell lines cluster above.
+The above clustering can be repeated as a mapping, where each cell is
+mapped to a cellular identity in the reference data set.
+
+First, the genes names of each data set must be aligned: the five cell
+line data set uses gene symbols whereas the three line data set uses
+ENSEMBL IDs.
+
     library("org.Hs.eg.db") 
 
     load(paste0(Path, "CountsMatrix"))
@@ -84,6 +97,8 @@ mixology data set, a mixture of three cancerous cell lines
 
     ReferenceCountsMatrix <- ReferenceCountsMatrix[CommonGenes,]
     MapCountsMatrix <- MapCountsMatrix[CommonGenes,]
+
+The gene-matched data sets can then be mapped.
 
     Ident <- scEC::Map(MapCountsMatrix = MapCountsMatrix,
                        ReferenceCountsMatrix = ReferenceCountsMatrix, 
