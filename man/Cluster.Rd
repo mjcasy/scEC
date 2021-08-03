@@ -11,11 +11,11 @@ Cluster(CountsMatrix, numClus, Multistart = 5, Greedy = F, Seed)
 
 \item{numClus}{Number of clusters (or maximum number of clusters for greedy)}
 
-\item{Multistart}{Number of restarts at each step}
+\item{Multistart}{Number of initial identity vectors trialed}
 
 \item{Greedy}{Boolean. Should greedy algorithm be used.}
 
-\item{Seed}{Seed}
+\item{Seed}{Seed set for both R and Python components}
 }
 \value{
 When Greedy = F, vector of integer identities. When Greedy = T,
