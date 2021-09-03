@@ -113,8 +113,6 @@ Cluster <- function(CountsMatrix, numClus, Multistart = 5, Greedy = F, Seed){
 #' @examples
 EntropyGain <- function(CountsMatrix, IdentMat){
 
-  reticulate::source_python("~/OneDrive - University of Southampton/Entropy/scIC/Scripts_for_pkg/Heterogeneity.py")
-
   numClus <- ncol(IdentMat)
   Freq <- GetFreq(CountsMatrix)
 
