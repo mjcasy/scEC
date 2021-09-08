@@ -54,7 +54,7 @@ Map <- function(MapCountsMatrix, ReferenceCountsMatrix, ReferenceID, minCounts =
   FullFreq <- cbind((RefN/N) * RefFreq, (MapN/N) * MapFreq)
   RefID <- as.numeric(ReferenceID)-1
 
-  mu <- PyFunc$eld(freq = FullFreq, refID = RefID)
+  mu <- PyFunc$meld(freq = FullFreq, refID = RefID)
   Ident <- apply(mu, 1, which.max) - 1
 
   levels(ReferenceID)[Ident+1]
