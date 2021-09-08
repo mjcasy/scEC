@@ -44,7 +44,7 @@ Cluster <- function(CountsMatrix, numClus, Multistart = 5, Greedy = F, Seed){
 
     BoolNewIdent[,1] <- newBool
 
-    Score <- sum(PyFunc$intertype(FullFreq, newIdent)) - sum(PyFunc$intertype(FullFreq, Ident[,1]))
+    Score <- sum(PyFunc$intercluster(FullFreq, newIdent)) - sum(PyFunc$intercluster(FullFreq, Ident[,1]))
 
     k <- 2
 
@@ -82,8 +82,8 @@ Cluster <- function(CountsMatrix, numClus, Multistart = 5, Greedy = F, Seed){
           newIdent <- Ident[,i]
           newIdent[BoolNewIdent[,k]] <- i
 
-          Score[k] <- sum(PyFunc$intertype(FullFreq, newIdent)) -
-            sum(PyFunc$intertype(FullFreq, Ident[,i]))
+          Score[k] <- sum(PyFunc$intercluster(FullFreq, newIdent)) -
+            sum(PyFunc$intercluster(FullFreq, Ident[,i]))
 
 
         } else {
@@ -122,7 +122,7 @@ EntropyGain <- function(CountsMatrix, IdentMat){
 
   Inter <- c()
   for(i in 1:numClus){
-    Inter[i] <- sum(PyFunc$intertype(freq = Freq, ident = IdentMat[,i]))
+    Inter[i] <- sum(PyFunc$intercluster(freq = Freq, ident = IdentMat[,i]))
   }
   Obs <- Inter[2:numClus] - Inter[1:(numClus-1)]
 

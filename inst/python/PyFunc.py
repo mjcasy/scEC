@@ -24,7 +24,7 @@ def pop(freq):
   return popG
   
       
-def intertype(freq, ident):
+def intercluster(freq, ident):
   
   ident = np.array(ident).astype(int)
   freq = np.array(freq)
@@ -37,9 +37,9 @@ def intertype(freq, ident):
   Nk = np.sum(mu, 0)
   logNk = np.log(Nk)
   
-  intertypeG = np.sum(y * (np.log(N * y) - logNk), 1)
+  interclusterG = np.sum(y * (np.log(N * y) - logNk), 1)
   
-  return intertypeG
+  return interclusterG
 
 
 def funcCost(wVec, freq, tfreq):
@@ -128,7 +128,7 @@ def multiStartClusterCells(freq, numClusters, multistart):
   for i in range(multistart):
     tempMu = clusterCells(freq, numClusters)
     newIdent = tempMu.argmax(1)
-    Score = intertype(freq, newIdent).sum()
+    Score = intercluster(freq, newIdent).sum()
     
     if Score > maxScore:
       maxmu = tempMu
@@ -222,7 +222,7 @@ def multiStartSplitCell(freq, multistart):
   for i in range(multistart):
     tempMu = splitCells(freq)
     newIdent = tempMu.argmax(1)
-    Score = intertype(freq, newIdent).sum()
+    Score = intercluster(freq, newIdent).sum()
     
     if Score > maxScore:
       maxmu = tempMu
