@@ -28,7 +28,7 @@ You can install the the development version from [GitHub](https://github.com/) w
 # install.packages("devtools")
 devtools::install_github("mjcasy/scEC")
 ```
-## Workflow
+## Clustering
 
 The basic workflow is demonstrated on the Tian et al 2018, single-cell mixology data set, a mixture of three cancerous cell lines (https://github.com/LuyiTian/sc_mixology).
 
@@ -60,4 +60,58 @@ Clustering <- scEC::Cluster(CountsMatrix, numClus = 3)
 InterCluster <- DifferentialExpression(CountsMatrix, Clustering)
 
 plot(Mean, InterCluster)
+```
+
+
+## Mapping to reference
+
+A novel count matrix can be mapped onto a previously clustered, reference counts matrix. Such mapping is useful in clustering samples from tissues for which cell atlases have already been generated.
+
+Tian et al 2018 also included an expanded data set, covering five cancerous cell lines, inclusive of the three cell lines cluster above. The above clustering can be repeated as a mapping, where each cell is mapped to a cellular identity in the reference data set.
+
+First, the genes names of each data set must be aligned: the five cell line data set uses gene symbols whereas the three line data set uses ENSEMBL IDs.
+
+```{r, include = FALSE}
+Path2 <- "~/OneDrive - University of Southampton/Data/Tian2018/"
+```
+
+```{r, message = FALSE}
+library("org.Hs.eg.db") 
+
+load(paste0(Path, "CountsMatrix"))
+MapCountsMatrix <- CountsMatrix
+load(paste0(Path, "Identity"))
+MapID <- Identity
+
+load(paste0(Path2, "CountsMatrix"))
+ReferenceCountsMatrix <- CountsMatrix
+load(paste0(Path2, "Identity"))
+ReferenceID <- Identity
+
+symbols <- mapIds(org.Hs.eg.db, 
+                  keys = rownames(MapCountsMatrix), 
+                  keytype="ENSEMBL",
+                  column = "SYMBOL")
+
+syms <- symbols[!is.na(symbols)]
+
+MapCountsMatrix <- MapCountsMatrix[names(syms),]
+MapCountsMatrix@Dimnames[[1]] <- unname(syms)
+
+RefGenes <- row.names(ReferenceCountsMatrix)
+MapGenes <- row.names(MapCountsMatrix)
+CommonGenes <- intersect(RefGenes, MapGenes)
+
+ReferenceCountsMatrix <- ReferenceCountsMatrix[CommonGenes,]
+MapCountsMatrix <- MapCountsMatrix[CommonGenes,]
+```
+
+The gene-matched data sets can then be mapped.
+
+```{r}
+Ident <- scEC::Map(MapCountsMatrix = MapCountsMatrix,
+                   ReferenceCountsMatrix = ReferenceCountsMatrix, 
+                   ReferenceID = ReferenceID)
+
+knitr::kable(table(Ident, MapID))
 ```

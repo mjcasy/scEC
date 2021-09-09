@@ -3,9 +3,9 @@
 #'
 #' @param CountsMatrix Feature x cell sparse counts matrix of class dgCMatrix
 #' @param numClus Number of clusters (or maximum number of clusters for greedy)
-#' @param Multistart Number of restarts at each step
+#' @param Multistart Number of initial identity vectors trialed
 #' @param Greedy Boolean. Should greedy algorithm be used.
-#' @param Seed Seed
+#' @param Seed Seed set for both R and Python components
 #'
 #' @return When Greedy = F, vector of integer identities. When Greedy = T,
 #' matrix where each column is a vector of integer identities. The Nth column

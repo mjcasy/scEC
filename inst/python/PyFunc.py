@@ -96,9 +96,9 @@ def clusterCells(freq, numClusters):
   freq = np.array(freq)
   numClusters = int(numClusters)
   
-  cN = freq.shape[1]
+  N = freq.shape[1]
   tfreq = freq.T
-  wVec = np.random.uniform(low = -0.5, high = 0.5, size = (numClusters*cN,))
+  wVec = np.random.uniform(low = -0.5, high = 0.5, size = (numClusters*N,))
       
   bounding = 3
   Bounds=optimize.Bounds(lb=-bounding, ub=bounding)
@@ -110,7 +110,7 @@ def clusterCells(freq, numClusters):
                           jac=gradCost,
                           bounds=Bounds)
                           
-  W = Out.x.reshape(cN, numClusters)
+  W = Out.x.reshape(N, numClusters)
   M = np.sum(np.exp(W), 1)
   mu = np.exp(W) / M[:,None]
   
@@ -230,3 +230,101 @@ def multiStartSplitCell(freq, multistart):
     
   return maxmu
     
+
+def meld(freq, refID):
+  freq = np.array(freq)
+  N = freq.shape[1]
+  
+  refID = np.array(refID).astype(int)
+  refN = refID.size
+  
+  C = np.unique(refID).size
+  
+  refW = np.ones(shape = (refN,C))
+  refW = -10*refW
+  refW[np.arange(refN),refID] = 10
+  
+  mapN = N - refN
+  wVec = np.random.uniform(low = -0.5, high = 0.5, size = (C*mapN,))
+  wVec = np.zeros(shape = (C*mapN,))
+  
+  rangeN = np.arange(start = refN, stop = N)
+  tfreq = freq[:,rangeN].T
+  
+  bounding = 3
+  Bounds=optimize.Bounds(lb=-bounding, ub=bounding)
+  
+  Out = optimize.minimize(funcCostMeld, 
+                          x0 = wVec, 
+                          args = (freq, tfreq, refW), 
+                          method = 'L-BFGS-B',
+                          jac=gradCostMeld,
+                          bounds=Bounds)
+                          
+  W = Out.x.reshape(mapN, C)
+  M = np.sum(np.exp(W), 1)
+  mu = np.exp(W) / M[:,None]
+  
+  return mu
+
+
+def funcCostMeld(wVec, freq, tfreq, refW):
+  N = freq.shape[1]
+  mapN = N - refW.shape[0]
+  C = int((wVec.size / mapN))
+  
+  wVecar = np.array(wVec)
+  mapW = wVecar.reshape(mapN, C)
+  
+  W = np.concatenate((refW, mapW))
+  
+  M = np.sum(np.exp(W), 1)
+  mu = np.exp(W) / M[:,None]
+  
+  y = freq @ mu
+  
+  Nj = np.sum(mu, 0)
+  logNj = np.log(Nj)
+  
+  Is = -1*np.sum(y * (np.log(N * y) - logNj))
+  
+  return Is
+  
+  
+def gradCostMeld(wVec, freq, tfreq, refW):
+  N = freq.shape[1]
+  mapN = N - refW.shape[0]
+  C = int((wVec.size / mapN))
+  
+  wVecar = np.array(wVec)
+  mapW = wVecar.reshape(mapN, C)
+  
+  W = np.concatenate((refW, mapW))
+  
+  M = np.sum(np.exp(W), 1)
+  mu = np.exp(W) / M[:,None]
+  
+  y = freq @ mu
+  
+  Nj = np.sum(mu, 0)
+  yNj = y / Nj
+  
+  term1 = np.log(yNj) + np.log(N) + 1
+  dIsdu = tfreq @ term1
+  term2 = -1*np.sum(yNj, 0)
+  dIsdu = dIsdu + term2
+  
+  M = np.sum(np.exp(mapW), 1)
+  mu = np.exp(mapW) / M[:,None]
+  
+  dIsdw = dIsdu * mu * (1 - mu)
+  
+  iterC = np.arange(C)
+  
+  for j in iterC:
+    ind = iterC[iterC!=j]
+    term2 = np.transpose(-1 * np.transpose(mu[:,ind]) * mu[:,j])
+    dIsdw[:,j] = dIsdw[:,j] + np.sum(dIsdu[:,ind] * term2, 1)
+  
+  dIsdwVec = -1 * dIsdw.reshape((dIsdw.size,))
+  return dIsdwVec
