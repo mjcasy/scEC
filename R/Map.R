@@ -51,7 +51,17 @@ Map <- function(MapCountsMatrix, ReferenceCountsMatrix, ReferenceID, minCounts =
   RefFreq <- GetFreq(ReferenceCountsMatrix)
   MapFreq <- GetFreq(MapCountsMatrix)
 
+  MRefg <- Matrix::rowSums(ReferenceCountsMatrix)
+  pRefg <- MRefg / sum(MRefg)
+  MMapg <- Matrix::rowSums(MapCountsMatrix)
+  pMapg <- MMapg / sum(MMapg)
+
+  RefFreq <- sweep(RefFreq, 1, pRefg, "*")
+  MapFreq <- sweep(MapFreq, 1, pMapg, "*")
+
   FullFreq <- cbind((RefN/N) * RefFreq, (MapN/N) * MapFreq)
+  FullFreq <- sweep(FullFreq, 1, rowSums(FullFreq), "/")
+
   RefID <- as.numeric(ReferenceID)-1
 
   mu <- PyFunc$meld(freq = FullFreq, refID = RefID)
