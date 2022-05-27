@@ -119,6 +119,8 @@ def clusterCells(freq, numClusters):
 
 def multiStartClusterCells(freq, numClusters, multistart):
   
+  global maxmu
+  
   freq = np.array(freq)
   numClusters = int(numClusters)
   multistart = int(multistart)
@@ -213,6 +215,8 @@ def splitCells(freq):
 
 
 def multiStartSplitCell(freq, multistart):
+  
+  global maxmu
   
   freq = np.array(freq)
   multistart = int(multistart)
