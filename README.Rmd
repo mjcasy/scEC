@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-Single-cell Entropic Clustering (scEC) provides an entropy based approach to normalisation, feature selection, differential expression analysis and unsupervised clustering of single-cell RNA-sequencing data.
+Single-cell Entropic Clustering (scEC) provides an entropy based approach to normalisation, feature selection, differential expression analysis and unsupervised clustering of single-cell RNA-sequencing data. Pre-print is avaialble at https://www.biorxiv.org/content/10.1101/2020.10.01.322255v4.
 
 ## Installation
 
