@@ -47,6 +47,7 @@ FeatureSelection <- function(CountsMatrix, minCounts = 100, nGenes = 500){
   Exp <- rownames(CountsMatrix)[Matrix::rowSums(CountsMatrix) >= minCounts]
 
   Div <- Population(CountsMatrix[which(rownames(CountsMatrix) %in% Exp),])
+  Div <- Div[Div > 0]
   GOI <- names(sort(Div, decreasing = T)[1:nGenes])
 
   GOI
