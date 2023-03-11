@@ -28,6 +28,9 @@ You can install the the development version from [GitHub](https://github.com/) w
 # install.packages("devtools")
 devtools::install_github("mjcasy/scEC")
 ```
+
+Note that the package has two python dependencies: Numpy and Scipy. You can download both via the reticulate package using py_install("numpy") and py_install("scipy").
+
 ## Clustering
 
 The basic workflow is demonstrated on the Tian et al 2018, single-cell mixology data set, a mixture of three cancerous cell lines (https://github.com/LuyiTian/sc_mixology).

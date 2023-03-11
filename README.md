@@ -7,8 +7,9 @@
 
 Single-cell Entropic Clustering (scEC) provides an entropy based
 approach to normalisation, feature selection, differential expression
-analysis and unsupervised clustering of single-cell RNA-sequencing data. 
-Pre-print is avaialble at https://www.biorxiv.org/content/10.1101/2020.10.01.322255v4.
+analysis and unsupervised clustering of single-cell RNA-sequencing data.
+Pre-print is avaialble at
+<https://www.biorxiv.org/content/10.1101/2020.10.01.322255v4>.
 
 ## Installation
 
@@ -17,6 +18,10 @@ You can install the the development version from
 
     # install.packages("devtools")
     devtools::install_github("mjcasy/scEC")
+
+Note that the package has two python dependencies: Numpy and Scipy. You
+can download both via the reticulate package using py\_install(“numpy”)
+and py\_install(“scipy”).
 
 ## Clustering
 
@@ -31,6 +36,7 @@ mixology data set, a mixture of three cancerous cell lines
     #> 
     #>     Map
     library(Matrix)
+    #> Warning: package 'Matrix' was built under R version 4.1.2
 
     load(paste0(Path, "CountsMatrix"))
 
@@ -71,6 +77,7 @@ line data set uses gene symbols whereas the three line data set uses
 ENSEMBL IDs.
 
     library("org.Hs.eg.db") 
+    #> Warning: package 'S4Vectors' was built under R version 4.1.1
 
     load(paste0(Path, "CountsMatrix"))
     MapCountsMatrix <- CountsMatrix
