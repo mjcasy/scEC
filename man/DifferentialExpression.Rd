@@ -17,3 +17,12 @@ Numeric vector of gene-wise inter-type heterogeneities
 \description{
 Differential Expression by Inter-Type Heterogeneity
 }
+\examples{
+set.seed(1)
+CountsMatrix <- Matrix::sparseMatrix(i = sample(10, 100, replace = TRUE),
+j = sample(10, 100, replace = TRUE),
+x = 1L,
+dims = c(10,10))
+Clustering <- factor(sample(2, 10, replace = TRUE))
+DifferentialExpression(CountsMatrix, Clustering)
+}

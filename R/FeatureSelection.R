@@ -7,6 +7,12 @@
 #' @export
 #'
 #' @examples
+#' set.seed(1)
+#' CountsMatrix <- Matrix::sparseMatrix(i = sample(10, 100, replace = TRUE),
+#' j = sample(10, 100, replace = TRUE),
+#' x = 1L,
+#' dims = c(10,10))
+#' Ig <- Population(CountsMatrix)
 Population <- function(CountsMatrix) {
 
   Total <- Matrix::rowSums(CountsMatrix)
@@ -35,19 +41,19 @@ Population <- function(CountsMatrix) {
 #' Feature Selection by Population Heterogeneity
 #'
 #' @param CountsMatrix Feature x cell sparse counts matrix of class dgCMatrix
-#' @param minCounts Minimum number of transcripts per gene
 #' @param nGenes Number of genes selected
+#' @param minHeterogeneity Threshold genes below specified level of heterogeneity (as measured by scEC::Population)
+#' @param minCounts Minimum number of transcripts per gene
 #'
 #' @return Vector of top genes by population heterogeneity
 #' @export
 #'
-#' @examples
-FeatureSelection <- function(CountsMatrix, minCounts = 100, nGenes = 500){
+FeatureSelection <- function(CountsMatrix, nGenes = 500, minHeterogeneity = 0, minCounts = 100){
 
   Exp <- rownames(CountsMatrix)[Matrix::rowSums(CountsMatrix) >= minCounts]
 
   Div <- Population(CountsMatrix[which(rownames(CountsMatrix) %in% Exp),])
-  Div <- Div[Div > 0]
+  Div <- Div[Div > minHeterogeneity]
   GOI <- names(sort(Div, decreasing = T)[1:nGenes])
 
   GOI

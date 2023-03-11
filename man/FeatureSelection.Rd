@@ -4,14 +4,21 @@
 \alias{FeatureSelection}
 \title{Feature Selection by Population Heterogeneity}
 \usage{
-FeatureSelection(CountsMatrix, minCounts = 100, nGenes = 500)
+FeatureSelection(
+  CountsMatrix,
+  nGenes = 500,
+  minHeterogeneity = 0,
+  minCounts = 100
+)
 }
 \arguments{
 \item{CountsMatrix}{Feature x cell sparse counts matrix of class dgCMatrix}
 
-\item{minCounts}{Minimum number of transcripts per gene}
-
 \item{nGenes}{Number of genes selected}
+
+\item{minHeterogeneity}{Threshold genes below specified level of heterogeneity (as measured by scEC::Population)}
+
+\item{minCounts}{Minimum number of transcripts per gene}
 }
 \value{
 Vector of top genes by population heterogeneity

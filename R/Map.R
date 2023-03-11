@@ -9,7 +9,6 @@
 #'
 #' @return Vector of top genes by inter-cluster heterogeneity
 #'
-#' @examples
 MapFeatureSelection <- function(ReferenceCountsMatrix, ReferenceID, minCounts, nGenes){
 
   Exp <- rownames(ReferenceCountsMatrix)[Matrix::rowSums(ReferenceCountsMatrix) >= minCounts]
@@ -32,7 +31,6 @@ MapFeatureSelection <- function(ReferenceCountsMatrix, ReferenceID, minCounts, n
 #' @return Mapped cellular identities
 #' @export
 #'
-#' @examples
 Map <- function(MapCountsMatrix, ReferenceCountsMatrix, ReferenceID, minCounts = 100, nGenes = 1000, Seed){
 
   if(!missing(Seed)){

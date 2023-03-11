@@ -2,7 +2,6 @@
 
 export(Cluster)
 export(DifferentialExpression)
-export(EntropyGain)
 export(FeatureSelection)
 export(Map)
 export(Population)

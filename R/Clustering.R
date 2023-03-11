@@ -12,7 +12,6 @@
 #' encodes N clusters.
 #' @export
 #'
-#' @examples
 Cluster <- function(CountsMatrix, numClus, Multistart = 5, Greedy = F, Seed){
 
   if(!missing(Seed)){
@@ -108,9 +107,7 @@ Cluster <- function(CountsMatrix, numClus, Multistart = 5, Greedy = F, Seed){
 #' @param IdentMat Matrix output of scEC (Greedy = T)
 #'
 #' @return Observed versus expected gains in inter-type heterogeneity
-#' @export
 #'
-#' @examples
 EntropyGain <- function(CountsMatrix, IdentMat){
 
   numClus <- ncol(IdentMat)
