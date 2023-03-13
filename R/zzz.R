@@ -1,11 +1,10 @@
 
-# .onLoad <- function(libname, pkgname){
-#
-#   path <- system.file("python", package = "scEC")
-#
-#   PyFunc <- NULL
-#   PyFunc <<- reticulate::import_from_path("PyFunc", path = path)
-#
-# }
+.onLoad <- function(libname, pkgname){
 
-PyFunc <- reticulate::import_from_path("PyFunc", path = "inst/python/")
+  path <- system.file("python", package = "scEC")
+
+  PyFunc <- reticulate::import_from_path("PyFunc", path = path)
+  assign(x = "PyFunc", value = PyFunc, envir = topenv())
+
+}
+

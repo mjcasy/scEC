@@ -1,5 +1,5 @@
 Package: scEC
-Title: What the Package Does (One Line, Title Case)
+Title: Single-cell Entropic Clustering
 Version: 1.1
 Authors@R: 
     person(given = "Michael",
